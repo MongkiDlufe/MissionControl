@@ -32,7 +32,8 @@ Not affiliated with ndeadly, Nintendo, or GameSir.
 - PID `3537:1022`。不要用 2.4G/USB 的 Xbox 身份（`3537:105E`）。
 - **Xbox 键** = Home（报表 `0x02`）。**下方 Share** = 截图（键盘 `0x01` / PrintScreen）。
 - 面键按手柄上的 **A/B/X/Y 字母** 对应 Switch。
-- 震动/体感取决于固件是否在蓝牙上打开扩展 HID；官方体感标为仅 PC。协议细节见 [docs/G7Pro-Bluetooth.md](docs/G7Pro-Bluetooth.md)。
+- 震动取决于固件是否在蓝牙上打开扩展 HID。
+- **陀螺仪 / 体感：蓝牙下已确认不受支持，本 fork 不再研究**（官方亦标为仅 PC）。详见 [docs/G7Pro-Bluetooth.md](docs/G7Pro-Bluetooth.md)。
 
 ### 从源码构建
 
@@ -72,7 +73,7 @@ Upstream **0.16.0** already names G7 Pro but **cannot** be used on AMS 1.6.2.
 
 Extract a release zip to the SD card root (`010000000000bd00` + `exefs_patches`) and reboot. Pair from **Controllers → Change Grip/Order**. Bluetooth Android/DInput only (`3537:1022`).
 
-Xbox button → Home (`0x02`). Share under Xbox → Capture (keyboard `0x01`, usage `0x46`). Face buttons follow **printed letters**. Rumble/gyro need extended HID; vendor documents gyro as PC-only. See [docs/G7Pro-Bluetooth.md](docs/G7Pro-Bluetooth.md).
+Xbox button → Home (`0x02`). Share under Xbox → Capture (keyboard `0x01`, usage `0x46`). Face buttons follow **printed letters**. Rumble may work if extended HID is present. **Gyro/motion over Bluetooth is confirmed unsupported and will not be pursued.** See [docs/G7Pro-Bluetooth.md](docs/G7Pro-Bluetooth.md).
 
 ### Build
 
