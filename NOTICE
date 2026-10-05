@@ -1,0 +1,21 @@
+MissionControl — GameSir G7 Pro (HOS 17 / AMS 1.6.2) fork
+==========================================================
+
+This repository is a fork of ndeadly/MissionControl
+(https://github.com/ndeadly/MissionControl), licensed under the
+GNU General Public License version 2. See LICENSE.
+
+Upstream base: v0.10.0 (commit 38c9879), the last official release
+that matches Nintendo Switch firmware 17.0.1 and Atmosphère 1.6.2.
+
+This fork is not affiliated with ndeadly, Nintendo, or GameSir.
+Do not install this build on Atmosphère 1.12 / HOS 23.x (that stack
+needs official Mission Control 0.16.0).
+
+Added/changed in this fork (GPL-2.0 source):
+- Identify GameSir devices (VID 0x3537 / name) before Nintendo names
+- GameSir G7 Pro Bluetooth HID mapping: report 0x07, Home 0x02,
+  Capture/Share keyboard 0x01 PrintScreen, optional rumble/IMU
+
+Firmware images, decrypted app.bin, and vendor UWP packages are
+NOT part of this source release (third-party copyright).

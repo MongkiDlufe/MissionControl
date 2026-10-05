@@ -3,17 +3,16 @@ MC_MITM_TID := 010000000000bd00
 
 GIT_BRANCH := $(shell git symbolic-ref --short HEAD | sed s/[^a-zA-Z0-9_-]/_/g)
 GIT_HASH := $(shell git rev-parse --short HEAD)
-GIT_TAG := $(shell git describe --tags `git rev-list --tags --max-count=1`)
-
-VERSION := $(shell printf "0x%02X%02X%02X" $(shell echo "$(GIT_TAG)" | sed -E 's/^v([0-9]+).([0-9]+).([0-9]+)/\1 \2 \3/g'))
-BUILD_VERSION := $(GIT_TAG:v%=%)-$(GIT_BRANCH)-$(GIT_HASH)
+GIT_TAG := v0.10.0
+VERSION := 0x000A00
+BUILD_VERSION := 0.10.0-g7pro-ams162-$(GIT_HASH)
 BUILD_DATE := $(shell date)
 
 TARGETS := mcmitm_version.cpp mc_mitm
 
 all: $(TARGETS)
 
-mcmitm_version.cpp: .git/HEAD .git/index
+mcmitm_version.cpp:
 	echo "namespace ams::mc { unsigned int mc_version = $(VERSION); const char *mc_build_name = \"$(BUILD_VERSION)\"; const char *mc_build_date = \"$(BUILD_DATE)\"; }" > mc_mitm/source/$@
 
 mc_mitm:

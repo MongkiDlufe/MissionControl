@@ -16,6 +16,8 @@
 #include "controller_management.hpp"
 #include <stratosphere.hpp>
 #include "../utils.hpp"
+#include <cctype>
+#include <cstring>
 
 namespace ams::controller {
 
@@ -40,12 +42,60 @@ namespace ams::controller {
         constexpr auto cod_minor_joystick   = 0x04;
         constexpr auto cod_minor_keyboard   = 0x40;
 
+        constexpr auto gamesir_vid = 0x3537;
+
+        bool NameLooksLikeGamesir(const char *name) {
+            if ((name == nullptr) || (name[0] == '\0')) {
+                return false;
+            }
+
+            auto contains = [&](const char *needle) {
+                const size_t nlen = std::strlen(needle);
+                const size_t hlen = std::strlen(name);
+                if (nlen > hlen) {
+                    return false;
+                }
+                for (size_t i = 0; i + nlen <= hlen; ++i) {
+                    bool ok = true;
+                    for (size_t j = 0; j < nlen; ++j) {
+                        if (std::tolower(static_cast<unsigned char>(name[i + j])) !=
+                            std::tolower(static_cast<unsigned char>(needle[j]))) {
+                            ok = false;
+                            break;
+                        }
+                    }
+                    if (ok) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+
+            return contains("gamesir") || contains("g7pro") || contains("g7 pro") || contains("g7-pro");
+        }
+
+        bool IsGamesirDevice(const bluetooth::DevicesSettings *device) {
+            if (device->vid == gamesir_vid) {
+                return true;
+            }
+            if (NameLooksLikeGamesir(device->name.name) || NameLooksLikeGamesir(device->name2)) {
+                return true;
+            }
+            return false;
+        }
+
         os::Mutex g_controller_lock(false);
         std::vector<std::shared_ptr<SwitchController>> g_controllers;
 
     }
 
     ControllerType Identify(const bluetooth::DevicesSettings *device) {
+
+        // G7 Pro Switch/Android firmware may spoof a Pro Controller name while
+        // still using GameSir HID reports (0x07). Identify it before Nintendo names.
+        if (IsGamesirDevice(device)) {
+            return ControllerType_Gamesir;
+        }
 
         for (auto hwId : SwitchController::hardware_ids) {
             if ( (device->vid == hwId.vid) && (device->pid == hwId.pid) ) {

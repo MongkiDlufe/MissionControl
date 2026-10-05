@@ -78,6 +78,31 @@ namespace ams::controller {
         u8 _unk[2];
     } PACKED;
 
+    struct GamesirReport0x07 {
+        GamesirStickData left_stick;
+        GamesirStickData right_stick;
+        u8 dpad;
+        u8 A      : 1;
+        u8 B      : 1;
+        u8        : 1;
+        u8 X      : 1;
+        u8 Y      : 1;
+        u8        : 1;
+        u8 LB     : 1;
+        u8 RB     : 1;
+        u8 LT     : 1;
+        u8 RT     : 1;
+        u8 select : 1;
+        u8 start  : 1;
+        u8 home   : 1;
+        u8 L3     : 1;
+        u8 R3     : 1;
+        u8        : 0;
+        u8 right_trigger;
+        u8 left_trigger;
+        u8 _unk[2];
+    } PACKED;
+
     struct GamesirReport0x12 {
         u8      : 3;
         u8 home : 1;
@@ -99,6 +124,7 @@ namespace ams::controller {
         u8 id;
         union {
             GamesirReport0x03 input0x03;
+            GamesirReport0x07 input0x07;
             GamesirReport0x12 input0x12;
             GamesirReport0xc4 input0xc4;
         };
@@ -111,6 +137,10 @@ namespace ams::controller {
                 {0xffff, 0x046e},   // Gamesir G3s
                 {0x05ac, 0x022d},   // Gamesir G3s (Alternate mode. Lol, this is actually the ID of an Apple wireless keyboard)
                 {0xffff, 0x046f},   // Gamesir G4s
+                {0x3537, 0x1022},   // Gamesir G7 Pro
+                {0x3537, 0x1020},
+                {0x3537, 0x1021},
+                {0x3537, 0x1046},
                 {0xffff, 0x0450},   // Gamesir T1s
                 {0x05ac, 0x056b}    // Gamesir T2a
             };
@@ -118,12 +148,31 @@ namespace ams::controller {
             GamesirController(const bluetooth::Address *address, HardwareID id)
             : EmulatedSwitchController(address, id) { }
 
+            Result Initialize() override;
+            Result SetVibration(const SwitchRumbleData *rumble_data) override;
+            Result CancelVibration() override;
             void ProcessInputData(const bluetooth::HidReport *report) override;
 
         private:
             void MapInputReport0x03(const GamesirReportData *src);
+            void MapInputReport0x07(const GamesirReportData *src);
+            void MapInputReport0x02(const GamesirReportData *src);
             void MapInputReport0x12(const GamesirReportData *src);
             void MapInputReport0xc4(const GamesirReportData *src);
+            void MapNintendoInputReport(const bluetooth::HidReport *report);
+            void MapVendorImu(const u8 *payload, size_t length);
+            void MapKeyboardReport(const u8 *bytes, size_t size);
+            void ApplyFaceButtons(bool south, bool east, bool west, bool north);
+            void ApplyLatchedShareButtons();
+            Result PushRumbleState(u8 left, u8 right, u8 trigger_l, u8 trigger_r);
+            Result SendRawOutput(u8 report_id, const u8 *payload, size_t payload_size);
+            void EnableExtendedFeatures();
+
+            u8 m_rumble_left{};
+            u8 m_rumble_right{};
+            u8 m_rumble_lt{};
+            u8 m_rumble_rt{};
+            u8 m_capture_ttl{};
 
     };
 
